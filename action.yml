@@ -1,0 +1,5 @@
+﻿name: 'Semantic Versioning Tag Tracking'
+description: 'Keep tag vx and vx.y update with vx.y.z'
+runs:
+  using: node16
+  main: index.js
