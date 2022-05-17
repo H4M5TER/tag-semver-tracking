@@ -6900,21 +6900,23 @@ var tag = getRequiredInput("tag");
 var token = getRequiredInput("token");
 var { repo } = github.context;
 var octokit = github.getOctokit(token);
-async function updateRef(ref, sha) {
-  const resp = await octokit.rest.git.getRef(__spreadProps(__spreadValues({}, repo), {
+function updateRef(ref, sha) {
+  octokit.rest.git.getRef(__spreadProps(__spreadValues({}, repo), {
     ref
-  }));
-  if (resp.status === 200) {
+  })).then(() => {
     octokit.rest.git.updateRef(__spreadProps(__spreadValues({}, repo), {
       ref,
       sha
     }));
-  } else {
-    octokit.rest.git.updateRef(__spreadProps(__spreadValues({}, repo), {
+  }).catch((e) => {
+    if (e.status !== 404) {
+      throw e;
+    }
+    octokit.rest.git.createRef(__spreadProps(__spreadValues({}, repo), {
       ref,
       sha
     }));
-  }
+  });
 }
 async function run() {
   if (!tag)
@@ -6926,8 +6928,8 @@ async function run() {
     ref: "tags/" + tag
   }));
   const { sha } = resp.data.object;
-  updateRef("tags/" + prefix + major, sha);
-  updateRef("tags/" + prefix + minor, sha);
+  updateRef("refs/tags/" + prefix + major, sha);
+  updateRef("refs/tags/" + prefix + minor, sha);
 }
 try {
   run();
