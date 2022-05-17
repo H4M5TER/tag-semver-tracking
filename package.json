@@ -4,12 +4,11 @@
   "license": "MIT",
   "author": "H4M5TER <zhuxx2003@gmail.com>",
   "scripts": {
-    "build": "esbuild index.ts --bundle --minify --sourcemap --sources-content=false --platform=node --target=node16 --outdir=dist"
+    "build": "esbuild index.ts --bundle --platform=node --target=node16 --outdir=dist"
   },
   "dependencies": {
     "@actions/core": "^1.8.0",
-    "@actions/github": "^5.0.1",
-    "semver": "^7.3.7"
+    "@actions/github": "^5.0.1"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.2",

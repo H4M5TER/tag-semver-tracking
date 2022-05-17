@@ -33,7 +33,7 @@ async function updateRef(ref: string, sha: string) {
 async function run() {
   if (!tag)
     return
-  const [, prefix = '', version] = tag.match(/(.*)(\d+\.\d+\.\d+)/)
+  const [, prefix = '', version, minor, major] = tag.match(/(.*)(((\d+)\.\d+)\.\d+)/)
   if (!version)
     return
   const resp = await octokit.rest.git.getRef({
@@ -41,10 +41,8 @@ async function run() {
     ref: 'tags/' + tag
   })
   const { sha } = resp.data.object
-  const major = 'tags/' + prefix + semver.major(version)
-  const minor = 'tags/' + prefix + semver.minor(version)
-  updateRef(major, sha)
-  updateRef(minor, sha)
+  updateRef('tags/' + prefix + major, sha)
+  updateRef('tags/' + prefix + minor, sha)
 }
 
 try {
