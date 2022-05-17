@@ -2,12 +2,14 @@ import * as github from '@actions/github'
 import * as core from '@actions/core'
 import semver from 'semver'
 
-const context: typeof github.context & { token?: string } = github.context
-const { payload, repo, ref, sha, token } = context
-const octokit = github.getOctokit(token)
-// const { action, issue, milestone } = payload
+const getRequiredInput = (name: string) => core.getInput(name, { required: true })
+const tag = getRequiredInput('tag')
+const token = getRequiredInput('token')
 
-async function updateRef(ref: string) {
+const { repo } = github.context
+const octokit = github.getOctokit(token)
+
+async function updateRef(ref: string, sha: string) {
   const resp = await octokit.rest.git.getRef({
     ...repo,
     ref: ref
@@ -29,15 +31,20 @@ async function updateRef(ref: string) {
 }
 
 async function run() {
-  if (!ref.includes('tags')) {
-    core.info('invalid usage with a branch ref')
+  if (!tag)
     return
-  }
-  const [, prefix = '', version] = ref.match(/refs\/tags\/(.*)(\d+\.\d+\.\d+)/)
+  const [, prefix = '', version] = tag.match(/(.*)(\d+\.\d+\.\d+)/)
+  if (!version)
+    return
+  const resp = await octokit.rest.git.getRef({
+    ...repo,
+    ref: 'tags/' + tag
+  })
+  const { sha } = resp.data.object
   const major = 'tags/' + prefix + semver.major(version)
   const minor = 'tags/' + prefix + semver.minor(version)
-  updateRef(major)
-  updateRef(minor)
+  updateRef(major, sha)
+  updateRef(minor, sha)
 }
 
 try {
