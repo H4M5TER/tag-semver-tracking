@@ -1,0 +1,12 @@
+name: 'Semantic Versioning Tag Tracking'
+description: 'Keep tag vx and vx.y update with vx.y.z'
+inputs:
+  tag:
+    description: Tag need to be sync.
+    required: true
+  token:
+    description: GitHub token
+    required: true
+runs:
+  using: node16
+  main: index.js
