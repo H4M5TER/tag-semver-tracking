@@ -1,5 +1,5 @@
-name: 'Semantic Versioning Tag Tracking'
-description: 'Keep tag vx and vx.y update with vx.y.z'
+name: 'SemVer Tag Tracking'
+description: 'Keep major and minor versioning tags update with patch.'
 inputs:
   tag:
     description: Tag need to be sync.
