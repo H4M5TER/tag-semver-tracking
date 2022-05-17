@@ -9,25 +9,27 @@ const token = getRequiredInput('token')
 const { repo } = github.context
 const octokit = github.getOctokit(token)
 
-async function updateRef(ref: string, sha: string) {
-  const resp = await octokit.rest.git.getRef({
+function updateRef(ref: string, sha: string) {
+  octokit.rest.git.getRef({
     ...repo,
     ref: ref
-  })
-  if (resp.status === 200) {
+  }).then(() => {
+    // if 200
     octokit.rest.git.updateRef({
       ...repo,
       ref: ref,
       sha: sha,
     })
-  } else {
-    octokit.rest.git.updateRef({
+  }).catch((e) => {
+    if (e.status !== 404) {
+      throw e
+    }
+    octokit.rest.git.createRef({
       ...repo,
       ref: ref,
       sha: sha
     })
-  }
-
+  })
 }
 
 async function run() {
@@ -41,8 +43,8 @@ async function run() {
     ref: 'tags/' + tag
   })
   const { sha } = resp.data.object
-  updateRef('tags/' + prefix + major, sha)
-  updateRef('tags/' + prefix + minor, sha)
+  updateRef('refs/tags/' + prefix + major, sha)
+  updateRef('refs/tags/' + prefix + minor, sha)
 }
 
 try {
