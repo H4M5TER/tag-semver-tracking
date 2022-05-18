@@ -10,6 +10,7 @@ on:
     paths:
     - 'action.yml'
     - 'index.ts'
+    - 'package.json'
     - 'pnpm-lock.yaml'
     - '.github/workflows/build.yml'
 

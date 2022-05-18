@@ -13,8 +13,8 @@ function updateRef(ref: string, sha: string) {
   octokit.rest.git.getRef({
     ...repo,
     ref: ref
-  }).then(() => {
-    // if 200
+  }).then((res) => {
+    console.log(res)
     octokit.rest.git.updateRef({
       ...repo,
       ref: ref,
@@ -24,6 +24,7 @@ function updateRef(ref: string, sha: string) {
     if (e.status !== 404) {
       throw e
     }
+    console.log(e)
     octokit.rest.git.createRef({
       ...repo,
       ref: ref,
@@ -35,6 +36,7 @@ function updateRef(ref: string, sha: string) {
 async function run() {
   if (!tag)
     return
+  core.info('tag: ' + tag)
   const [, prefix = '', version, minor, major] = tag.match(/(.*)(((\d+)\.\d+)\.\d+)/)
   if (!version)
     return
@@ -43,8 +45,8 @@ async function run() {
     ref: 'tags/' + tag
   })
   const { sha } = resp.data.object
-  updateRef('refs/tags/' + prefix + major, sha)
-  updateRef('refs/tags/' + prefix + minor, sha)
+  updateRef('tags/' + prefix + major, sha)
+  updateRef('tags/' + prefix + minor, sha)
 }
 
 try {
